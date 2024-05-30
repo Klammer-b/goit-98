@@ -20,6 +20,13 @@ export const startServer = () => {
 
   app.use(cors());
 
+  app.use(
+    express.json({
+      limit: '1mb',
+      type: ['application/json', 'application/vnd.api+json'],
+    }),
+  );
+
   app.use(studentsRouter);
 
   app.use(notFoundMiddleware);
