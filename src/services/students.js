@@ -45,7 +45,7 @@ export const getAllStudents = async ({
     studentsFilters.where('gender').equals(filter.gender);
   }
   if (typeof filter.onDuty === 'boolean') {
-    contactsQuery.where('onDuty').equals(filter.onDuty);
+    studentsFilters.where('onDuty').equals(filter.onDuty);
   }
   
   const [studentsCount, students] = await Promise.all([
