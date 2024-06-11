@@ -44,10 +44,10 @@ export const getAllStudents = async ({
   if (filter.gender) {
     studentsFilters.where('gender').equals(filter.gender);
   }
-  if (filter.onDuty) {
+  if (typeof filter.onDuty === 'boolean') {
     studentsFilters.where('onDuty').equals(filter.onDuty);
   }
-
+  
   const [studentsCount, students] = await Promise.all([
     Student.find().merge(studentsFilters).countDocuments(),
     Student.find()
