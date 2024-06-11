@@ -15,36 +15,30 @@ import { updateStudentSchema } from '../validation/updateStudentSchema.js';
 
 const studentsRouter = Router();
 
-studentsRouter.use('/students/:studentId', validateMongoId('studentId'));
+studentsRouter.use('/:studentId', validateMongoId('studentId'));
 
-studentsRouter.get('/students', ctrlWrapper(getStudentsController));
+studentsRouter.get('/', ctrlWrapper(getStudentsController));
 
-studentsRouter.get(
-  '/students/:studentId',
-  ctrlWrapper(getStudentByIdController),
-);
+studentsRouter.get('/:studentId', ctrlWrapper(getStudentByIdController));
 
 studentsRouter.post(
-  '/students',
+  '/',
   validateBody(createStudentSchema),
   ctrlWrapper(createStudentController),
 );
 
 studentsRouter.patch(
-  '/students/:studentId',
+  '/:studentId',
   validateBody(updateStudentSchema),
   ctrlWrapper(patchStudentController),
 );
 
 studentsRouter.put(
-  '/students/:studentId',
+  '/:studentId',
   validateBody(createStudentSchema),
   ctrlWrapper(putStudentController),
 );
 
-studentsRouter.delete(
-  '/students/:studentId',
-  ctrlWrapper(deleteStudentByIdController),
-);
+studentsRouter.delete('/:studentId', ctrlWrapper(deleteStudentByIdController));
 
 export default studentsRouter;
