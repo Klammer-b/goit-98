@@ -12,10 +12,14 @@ import { validateMongoId } from '../middlewares/validateMongoId.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { createStudentSchema } from '../validation/createStudentSchema.js';
 import { updateStudentSchema } from '../validation/updateStudentSchema.js';
+import { authenticate } from '../middlewares/authenticate.js';
+import { checkChildPermissions } from '../middlewares/checkRoles.js';
 
 const studentsRouter = Router();
 
 studentsRouter.use('/:studentId', validateMongoId('studentId'));
+
+studentsRouter.use('/', authenticate);
 
 studentsRouter.get('/', ctrlWrapper(getStudentsController));
 
@@ -29,6 +33,7 @@ studentsRouter.post(
 
 studentsRouter.patch(
   '/:studentId',
+  checkChildPermissions('teacher', 'parent'),
   validateBody(updateStudentSchema),
   ctrlWrapper(patchStudentController),
 );

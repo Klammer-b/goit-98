@@ -22,6 +22,7 @@ export const getAllStudents = async ({
   sortBy = '_id',
   sortOrder = 'asc',
   filter = {},
+  userId,
 }) => {
   const skip = perPage * (page - 1);
 
@@ -47,7 +48,9 @@ export const getAllStudents = async ({
   if (typeof filter.onDuty === 'boolean') {
     studentsFilters.where('onDuty').equals(filter.onDuty);
   }
-  
+
+  studentsFilters.where('parentId').equals(userId);
+
   const [studentsCount, students] = await Promise.all([
     Student.find().merge(studentsFilters).countDocuments(),
     Student.find()
@@ -82,8 +85,8 @@ export const getStudentById = async (id) => {
   return student;
 };
 
-export const createStudent = async (payload) => {
-  const student = await Student.create(payload);
+export const createStudent = async (payload, userId) => {
+  const student = await Student.create({ ...payload, parentId: userId });
 
   return student;
 };
