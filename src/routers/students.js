@@ -14,6 +14,7 @@ import { createStudentSchema } from '../validation/createStudentSchema.js';
 import { updateStudentSchema } from '../validation/updateStudentSchema.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { checkChildPermissions } from '../middlewares/checkRoles.js';
+import { upload } from '../middlewares/upload.js';
 
 const studentsRouter = Router();
 
@@ -27,6 +28,7 @@ studentsRouter.get('/:studentId', ctrlWrapper(getStudentByIdController));
 
 studentsRouter.post(
   '/',
+  upload.single('avatar'),
   validateBody(createStudentSchema),
   ctrlWrapper(createStudentController),
 );
@@ -34,12 +36,14 @@ studentsRouter.post(
 studentsRouter.patch(
   '/:studentId',
   checkChildPermissions('teacher', 'parent'),
+  upload.single('avatar'),
   validateBody(updateStudentSchema),
   ctrlWrapper(patchStudentController),
 );
 
 studentsRouter.put(
   '/:studentId',
+  upload.single('avatar'),
   validateBody(createStudentSchema),
   ctrlWrapper(putStudentController),
 );
