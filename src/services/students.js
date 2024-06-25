@@ -1,5 +1,6 @@
 import createHttpError from 'http-errors';
 import { Student } from '../db/models/student.js';
+import { saveFile } from '../utils/saveFile.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -85,18 +86,34 @@ export const getStudentById = async (id) => {
   return student;
 };
 
-export const createStudent = async (payload, userId) => {
-  const student = await Student.create({ ...payload, parentId: userId });
+export const createStudent = async ({ avatar, ...payload }, userId) => {
+  const url = await saveFile(avatar);
+
+  const student = await Student.create({
+    ...payload,
+    parentId: userId,
+    avatarUrl: url,
+  });
 
   return student;
 };
 
-export const upsertStudent = async (id, payload, options = {}) => {
-  const rawResult = await Student.findByIdAndUpdate(id, payload, {
-    new: true,
-    includeResultMetadata: true,
-    ...options,
-  });
+export const upsertStudent = async (
+  id,
+  { avatar, ...payload },
+  options = {},
+) => {
+  const url = await saveFile(avatar);
+
+  const rawResult = await Student.findByIdAndUpdate(
+    id,
+    { ...payload, avatarUrl: url },
+    {
+      new: true,
+      includeResultMetadata: true,
+      ...options,
+    },
+  );
 
   if (!rawResult || !rawResult.value) {
     throw createHttpError(404, 'Student not found');

@@ -1,8 +1,15 @@
 import createHttpError from 'http-errors';
+import jwt from 'jsonwebtoken';
+import Handlebars from 'handlebars';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { User } from '../db/models/user.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { Session } from '../db/models/session.js';
+import { env } from '../utils/env.js';
+import { ENV_VARS, TEMPLATE_DIR } from '../constants/index.js';
+import { sendMail } from '../utils/sendMail.js';
 
 const createSession = () => {
   return {
@@ -85,4 +92,65 @@ export const refreshSession = async ({ sessionId, sessionToken }) => {
     userId: user._id,
     ...createSession(),
   });
+};
+
+export const sendResetPassword = async (email) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw createHttpError(404, 'User is not found!');
+  }
+
+  const token = jwt.sign(
+    {
+      sub: user._id,
+      email,
+    },
+    env(ENV_VARS.JWT_SECRET),
+    {
+      expiresIn: 1,
+    },
+  );
+
+  const templateSource = await fs.readFile(
+    path.join(TEMPLATE_DIR, 'send-reset-password-email.html'),
+  );
+
+  const template = Handlebars.compile(templateSource.toString());
+
+  const html = template({
+    name: user.name,
+    link: `${env(ENV_VARS.FRONTEND_HOST)}/reset-password?token=${token}`,
+  });
+
+  try {
+    await sendMail({
+      html,
+      to: email,
+      from: env(ENV_VARS.SMTP_FROM),
+      subject: 'Reset your password!',
+    });
+  } catch (err) {
+    console.log(err);
+    throw createHttpError(500, 'Problem with sending emails');
+  }
+};
+
+export const resetPassword = async ({ token, password }) => {
+  let tokenPayload;
+  try {
+    tokenPayload = jwt.verify(token, env(ENV_VARS.JWT_SECRET));
+  } catch (err) {
+    throw createHttpError(401, err.message);
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await User.findOneAndUpdate(
+    {
+      _id: tokenPayload.sub,
+      email: tokenPayload.email,
+    },
+    { password: hashedPassword },
+  );
 };

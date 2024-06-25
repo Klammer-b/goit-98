@@ -42,8 +42,8 @@ export const getStudentByIdController = async (req, res) => {
 };
 
 export const createStudentController = async (req, res) => {
-  const { body } = req;
-  const student = await createStudent(body, req.user._id);
+  const { body, file } = req;
+  const student = await createStudent({ ...body, avatar: file }, req.user._id);
 
   res.status(201).json({
     status: 201,
@@ -53,9 +53,9 @@ export const createStudentController = async (req, res) => {
 };
 
 export const patchStudentController = async (req, res) => {
-  const { body } = req;
+  const { body, file } = req;
   const { studentId } = req.params;
-  const { student } = await upsertStudent(studentId, body);
+  const { student } = await upsertStudent(studentId, { ...body, avatar: file });
 
   res.status(200).json({
     status: 200,
@@ -65,11 +65,15 @@ export const patchStudentController = async (req, res) => {
 };
 
 export const putStudentController = async (req, res) => {
-  const { body } = req;
+  const { body, file } = req;
   const { studentId } = req.params;
-  const { isNew, student } = await upsertStudent(studentId, body, {
-    upsert: true,
-  });
+  const { isNew, student } = await upsertStudent(
+    studentId,
+    { ...body, avatar: file },
+    {
+      upsert: true,
+    },
+  );
 
   const status = isNew ? 201 : 200;
 
