@@ -10,6 +10,7 @@ import { Session } from '../db/models/session.js';
 import { env } from '../utils/env.js';
 import { ENV_VARS, TEMPLATE_DIR } from '../constants/index.js';
 import { sendMail } from '../utils/sendMail.js';
+import { validateGoogleOAuthCode } from '../utils/googleOAuth.js';
 
 const createSession = () => {
   return {
@@ -108,7 +109,7 @@ export const sendResetPassword = async (email) => {
     },
     env(ENV_VARS.JWT_SECRET),
     {
-      expiresIn: 1,
+      expiresIn: '5m',
     },
   );
 
@@ -153,4 +154,34 @@ export const resetPassword = async ({ token, password }) => {
     },
     { password: hashedPassword },
   );
+};
+
+export const loginOrSignupWithGoogleOAuth = async (code) => {
+  const payload = await validateGoogleOAuthCode(code);
+
+  if (!payload) throw createHttpError(401);
+
+  let user = await User.findOne({ email: payload.email });
+
+  if (!user) {
+    const hashedPassword = await bcrypt.hash(
+      crypto.randomBytes(40).toString('base64'),
+      10,
+    );
+
+    user = await User.create({
+      name: payload.given_name + ' ' + payload.family_name,
+      email: payload.email,
+      password: hashedPassword,
+    });
+  }
+
+  await Session.deleteOne({
+    userId: user._id,
+  });
+
+  return await Session.create({
+    userId: user._id,
+    ...createSession(),
+  });
 };
