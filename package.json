@@ -7,6 +7,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "preview-docs": "redocly preview-docs",
+    "build-docs": "redocly bundle --ext json -o docs/swagger.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,6 +16,7 @@
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.2.0",
+    "@redocly/cli": "^1.16.0",
     "eslint": "^9.2.0",
     "globals": "^15.2.0",
     "nodemon": "^3.1.0",
@@ -34,6 +37,7 @@
     "mongoose": "^8.4.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.13",
-    "pino-http": "^10.1.0"
+    "pino-http": "^10.1.0",
+    "swagger-ui-express": "^5.0.1"
   }
 }

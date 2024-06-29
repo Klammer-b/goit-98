@@ -50,7 +50,7 @@ export const getAllStudents = async ({
     studentsFilters.where('onDuty').equals(filter.onDuty);
   }
 
-  studentsFilters.where('parentId').equals(userId);
+  // studentsFilters.where('parentId').equals(userId);
 
   const [studentsCount, students] = await Promise.all([
     Student.find().merge(studentsFilters).countDocuments(),
