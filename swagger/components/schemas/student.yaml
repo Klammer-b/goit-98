@@ -1,0 +1,43 @@
+type: object
+required:
+  - _id
+  - name
+  - avgMark
+  - age
+  - gender
+  - onDuty
+properties:
+  _id:
+    type: string
+    example: 65ca67e7ae7f10c88b598384
+  name:
+    type: string
+    example: Borys
+  avgMark:
+    type: number
+    example: 10.1
+  age:
+    type: number
+    example: 12
+  gender:
+    type: string
+    enum:
+      - male
+      - female
+      - other
+    example: 65ca67e7ae7f10c88b598384
+  onDuty:
+    type: boolean
+    example: false
+  parentId:
+    oneOf:
+      - type: string
+        example: 65ca67e7ae7f10c88b598384
+      - type: 'null'
+        example: null
+  photo:
+    oneOf:
+      - type: string
+        example: some-url
+      - type: 'null'
+        example: null

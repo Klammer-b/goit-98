@@ -1,0 +1,53 @@
+tags:
+  - Students
+summary: Get students
+operationId: getStudents
+description: 'You can get access only to children added by you'
+security:
+  - bearerAuth: []
+parameters:
+  - in: query
+    name: page
+    required: false
+    schema:
+      type: number
+      default: 1
+      example: 1
+  - in: query
+    name: perPage
+    required: false
+    schema:
+      type: number
+      default: 10
+      example: 10
+
+responses:
+  '200':
+    description: 'Successful students retrieval'
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully found student with id 65ca67e7ae7f10c88b598384!
+            data:
+              type: object
+              required:
+                - students
+              properties:
+                students:
+                  type: array
+                  items:
+                    $ref: '../../components/schemas/student.yaml'
+
+  '401':
+    $ref: '../../components/responses/401.yaml'
